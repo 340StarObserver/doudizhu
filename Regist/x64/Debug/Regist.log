@@ -1,0 +1,23 @@
+﻿Build started 2015/9/18 14:57:05.
+     1>Project "D:\QT\workspace\doudizhu\Regist\Regist.vcxproj" on node 2 (Build target(s)).
+     1>CustomBuild:
+         Moc'ing registserver.h...
+         Moc'ing registwindow.h...
+       ClCompile:
+         D:\VS2013\installs\VC\bin\x86_amd64\CL.exe /c /I. /I..\..\..\..\qt\install\5.5\msvc2013_64\include /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtWidgets /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtGui /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtANGLE /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtSql /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtNetwork /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtCore /Idebug /I. /I"..\..\..\..\qt\install\5.5\msvc2013_64\mkspecs\win32-msvc2013" /I.\GeneratedFiles /Zi /nologo /W3 /WX- /Od /D _WINDOWS /D UNICODE /D WIN32 /D WIN64 /D QT_WIDGETS_LIB /D QT_GUI_LIB /D QT_SQL_LIB /D QT_NETWORK_LIB /D QT_CORE_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt -w34100 -w34189 -w44996 Debug\moc_registserver.cpp Debug\moc_registwindow.cpp
+         moc_registserver.cpp
+         moc_registwindow.cpp
+         Generating Code...
+       Link:
+         D:\VS2013\installs\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"debug\\Regist.exe" /NOLOGO /LIBPATH:D:\QT\install\5.5\msvc2013_64\lib /LIBPATH:D:/qt/install/5.5/msvc2013_64/lib /LIBPATH:D:\QT\install\5.5\msvc2013_64\lib D:\QT\install\5.5\msvc2013_64\lib\qtmaind.lib shell32.lib D:/qt/install/5.5/msvc2013_64/lib\Qt5Cored.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Widgetsd.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Guid.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Sqld.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Networkd.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Cored.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"debug\Regist.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" x64\Debug\moc_registserver.obj
+         x64\Debug\moc_registwindow.obj
+         x64\Debug\main.obj
+         x64\Debug\registserver.obj
+         x64\Debug\registwindow.obj
+         x64\Debug\usermodel.obj
+         Regist.vcxproj -> D:\QT\workspace\doudizhu\Regist\debug\Regist.exe
+     1>Done Building Project "D:\QT\workspace\doudizhu\Regist\Regist.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.22
