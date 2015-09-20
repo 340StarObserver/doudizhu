@@ -1,0 +1,54 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>res/bk.png</file>
+        <file>res/card2.png</file>
+        <file>res/clock.png</file>
+        <file>res/lord.png</file>
+        <file>res/farmer.png</file>
+    </qresource>
+    <qresource prefix="/sound">
+        <file>res/win.wav</file>
+        <file>res/shuffleCardsMusic.wav</file>
+        <file>res/1.wav</file>
+        <file>res/2.wav</file>
+        <file>res/3.wav</file>
+        <file>res/4.wav</file>
+        <file>res/5.wav</file>
+        <file>res/6.wav</file>
+        <file>res/7.wav</file>
+        <file>res/8.wav</file>
+        <file>res/9.wav</file>
+        <file>res/10.wav</file>
+        <file>res/11.wav</file>
+        <file>res/12.wav</file>
+        <file>res/13.wav</file>
+        <file>res/14.wav</file>
+        <file>res/15.wav</file>
+        <file>res/bombJokerMusic.wav</file>
+        <file>res/bujiao.wav</file>
+        <file>res/dui1.wav</file>
+        <file>res/dui2.wav</file>
+        <file>res/dui3.wav</file>
+        <file>res/dui4.wav</file>
+        <file>res/dui5.wav</file>
+        <file>res/dui6.wav</file>
+        <file>res/dui7.wav</file>
+        <file>res/dui8.wav</file>
+        <file>res/dui9.wav</file>
+        <file>res/dui10.wav</file>
+        <file>res/dui11.wav</file>
+        <file>res/dui12.wav</file>
+        <file>res/dui13.wav</file>
+        <file>res/jiaodizhu.wav</file>
+        <file>res/liandui.wav</file>
+        <file>res/passMusic.wav</file>
+        <file>res/sandaiyi.wav</file>
+        <file>res/sandaiyidui.wav</file>
+        <file>res/sange.wav</file>
+        <file>res/shunzi.wav</file>
+        <file>res/zhadan.wav</file>
+        <file>res/loseMusic.wav</file>
+        <file>res/planeMusic.wav</file>
+        <file>res/bkMusic.wav</file>
+    </qresource>
+</RCC>

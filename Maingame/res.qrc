@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>res/gamebg.png</file>
+        <file>res/icon.jpg</file>
+        <file>res/bgp1.png</file>
+        <file>res/bgp.png</file>
+        <file>res/lord.png</file>
+        <file>res/head3.png</file>
+        <file>res/head2.png</file>
+        <file>res/head1.png</file>
+        <file>res/farmer.png</file>
+        <file>res/wait.png</file>
+        <file>res/play.png</file>
+        <file>res/pause.png</file>
+        <file>res/20.png</file>
+        <file>res/17.png</file>
+        <file>res/win1.png</file>
+        <file>res/lose1.png</file>
+        <file>res/wrong.png</file>
+        <file>res/winner3.png</file>
+        <file>res/winner2.png</file>
+        <file>res/winner1.png</file>
+        <file>res/register.jpg</file>
+        <file>res/quan.png</file>
+        <file>res/player3.png</file>
+        <file>res/player2.png</file>
+        <file>res/player1.png</file>
+        <file>res/loser3.png</file>
+        <file>res/loser2.png</file>
+        <file>res/loser1.png</file>
+        <file>res/login.jpg</file>
+        <file>res/dou.png</file>
+        <file>res/available.png</file>
+        <file>res/bg.png</file>
+        <file>res/card.png</file>
+        <file>res/win.gif</file>
+        <file>res/lose.gif</file>
+    </qresource>
+</RCC>
