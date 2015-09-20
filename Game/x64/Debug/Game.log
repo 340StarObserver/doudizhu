@@ -1,0 +1,38 @@
+﻿Build started 2015/9/19 10:56:38.
+     1>Project "D:\QT\workspace\doudizhu\Game\Game.vcxproj" on node 2 (Build target(s)).
+     1>CustomBuild:
+         Moc'ing gameserver.h...
+         Moc'ing gamewindow.h...
+         Moc'ing loginbusiness.h...
+       ClCompile:
+         D:\VS2013\installs\VC\bin\x86_amd64\CL.exe /c /I. /I..\..\..\..\qt\install\5.5\msvc2013_64\include /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtWidgets /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtGui /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtANGLE /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtNetwork /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtSql /I..\..\..\..\qt\install\5.5\msvc2013_64\include\QtCore /Idebug /I. /I"..\..\..\..\qt\install\5.5\msvc2013_64\mkspecs\win32-msvc2013" /I.\GeneratedFiles /Zi /nologo /W3 /WX- /Od /D _WINDOWS /D UNICODE /D WIN32 /D WIN64 /D QT_WIDGETS_LIB /D QT_GUI_LIB /D QT_NETWORK_LIB /D QT_SQL_LIB /D QT_CORE_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt -w34100 -w34189 -w44996 Debug\moc_gameserver.cpp Debug\moc_gamewindow.cpp Debug\moc_loginbusiness.cpp
+         moc_gameserver.cpp
+     1>d:\qt\workspace\doudizhu\game\debug\../gameserver.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\qt\workspace\doudizhu\game\gamework.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\qt\workspace\doudizhu\game\player.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+     1>d:\qt\workspace\doudizhu\game\cardcombine.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+         moc_gamewindow.cpp
+     1>d:\qt\workspace\doudizhu\game\debug\../gamewindow.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+         moc_loginbusiness.cpp
+     1>d:\qt\workspace\doudizhu\game\debug\../loginbusiness.h : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
+         Generating Code...
+       Link:
+         D:\VS2013\installs\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"debug\\Game.exe" /NOLOGO /LIBPATH:D:\QT\install\5.5\msvc2013_64\lib /LIBPATH:D:/qt/install/5.5/msvc2013_64/lib /LIBPATH:D:\QT\install\5.5\msvc2013_64\lib D:\QT\install\5.5\msvc2013_64\lib\qtmaind.lib shell32.lib D:/qt/install/5.5/msvc2013_64/lib\Qt5Cored.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Widgetsd.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Guid.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Networkd.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Sqld.lib D:\QT\install\5.5\msvc2013_64\lib\Qt5Cored.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"debug\Game.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" x64\Debug\card.obj
+         x64\Debug\cardcombine.obj
+         x64\Debug\datapackage.obj
+         x64\Debug\moc_gameserver.obj
+         x64\Debug\moc_gamewindow.obj
+         x64\Debug\moc_loginbusiness.obj
+         x64\Debug\gameserver.obj
+         x64\Debug\gamewindow.obj
+         x64\Debug\gamework.obj
+         x64\Debug\loginbusiness.obj
+         x64\Debug\main.obj
+         x64\Debug\player.obj
+         x64\Debug\usermodel.obj
+         Game.vcxproj -> D:\QT\workspace\doudizhu\Game\debug\Game.exe
+     1>Done Building Project "D:\QT\workspace\doudizhu\Game\Game.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:06.16
