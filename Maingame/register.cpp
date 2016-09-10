@@ -1,13 +1,15 @@
-#include "register.h"
-#include "ui_register.h"
 #include <QPainter>
 #include <QPixmap>
-#include "login.h"
 #include <QString>
 #include <QRegExp>
-#include "clientsocket.h"
 #include <QMessageBox>
 #include <QDataStream>
+#include <QDebug>
+
+#include "login.h"
+#include "register.h"
+#include "ui_register.h"
+#include "clientsocket.h"
 
 Register::Register(QWidget *parent) :
     QDialog(parent),
@@ -231,7 +233,7 @@ void Register::onReadyRead()
 {
     QTcpSocket * socket=ClientSocket::getInstance()->getSocket();
     QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_5_5);
+    in.setVersion(QDataStream::Qt_5_7);
     bool res;
     in>>res;
     if(res)
@@ -279,7 +281,7 @@ void Register::accountEditingFinishedslot()
     accinfoLabe->setText(" ");
     QPixmap pics1(":/image/res/available.png");
     QPixmap pics2(":/image/res/wrong.png");
-    if(QRegExp("^\\d{2}[a-z0-9A-Z]{1}14\\d{3}").indexIn(accountLineEdit->text())==0)
+    if(QRegExp("^\\d{2}[a-z0-9A-Z]{1}15\\d{3}").indexIn(accountLineEdit->text())==0)
         aLabel1->setPixmap(pics1);
     else
         aLabel1->setPixmap(pics2);
@@ -291,7 +293,7 @@ void Register::passwordeditingFinishedslot()
     passinfoLabel->setText(" ");
     QPixmap pics1(":/image/res/available.png");
     QPixmap pics2(":/image/res/wrong.png");
-    if(QRegExp("21314\\d{4}").indexIn(passwordLineEdit->text())==0)
+    if(QRegExp("21315\\d{4}").indexIn(passwordLineEdit->text())==0)
         aLabel2->setPixmap(pics1);
     else
         aLabel2->setPixmap(pics2);
@@ -302,7 +304,7 @@ void Register::repeateditingFinishedslot()
 {
     QPixmap pics1(":/image/res/available.png");
     QPixmap pics2(":/image/res/wrong.png");
-    if(QRegExp("21314\\d{4}").indexIn(repeatLinEdit->text())==0 && passwordLineEdit->text()==repeatLinEdit->text())
+    if(QRegExp("21315\\d{4}").indexIn(repeatLinEdit->text())==0 && passwordLineEdit->text()==repeatLinEdit->text())
         aLabel4->setPixmap(pics1);
     else
        aLabel4->setPixmap(pics2);
@@ -347,14 +349,14 @@ void Register::radioButton_3slot(bool checked)
 }
 
 //校验数据合法性
-//账号必须是14级的学号,密码和重复密码都必须是14级的一卡通,重复密码等于密码
+//账号必须是15级的学号,密码和重复密码都必须是15级的一卡通,重复密码等于密码
 bool Register::validData()const
 {
     QString user=accountLineEdit->text();
     QString pwd=passwordLineEdit->text();
     QString rpwd=repeatLinEdit->text();
-    QRegExp re1("^\\d{2}[a-z0-9A-Z]{1}14\\d{3}");
-    QRegExp re2("21314\\d{4}");
+    QRegExp re1("^\\d{2}[a-z0-9A-Z]{1}15\\d{3}");
+    QRegExp re2("21315\\d{4}");
     if(re1.indexIn(user)!=0)
         return false;
     if(re2.indexIn(pwd)!=0)

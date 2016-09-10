@@ -1,5 +1,6 @@
 #include "gameoverframe.h"
 #include "ui_gameoverframe.h"
+#include "universal.h"
 #include <QPixmap>
 #include <QFont>
 #include<QMovie>

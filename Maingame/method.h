@@ -2,9 +2,10 @@
 #define METHOD_H
 
 #include <QWidget>
+#include <QMap>
 #include "wanjia.h"
 #include "hand.h"
-#include <QMap>
+
 
 class Method
 {

@@ -85,8 +85,8 @@ void Hand::DefineHandType()
         m_extra=0;
     }
     else if(m_oneCard.size()==1&&
-            m_oneCard[0]!=Card_SJ&&
-            m_oneCard[0]!=Card_BJ&&
+////            m_oneCard[0]!=Card_SJ&&
+////            m_oneCard[0]!=Card_BJ&&
             m_twoCard.size()==0&&
             m_threeCard.size()==1&&
             m_fourCard.size()==0
@@ -110,6 +110,8 @@ void Hand::DefineHandType()
             m_twoCard.size()==0&&
             m_threeCard.size()==2&&
             m_threeCard[0]+1==m_threeCard[1]&&
+            m_threeCard.first()>=Card_3&&
+               m_threeCard.last()<=Card_A&&
             m_fourCard.size()==0
             )
     {
@@ -118,12 +120,14 @@ void Hand::DefineHandType()
         m_extra=0;
     }
     else if(m_oneCard.size()==2&&
-            m_oneCard[0]!=Card_SJ&&
-            m_oneCard[1]!=Card_BJ&&
+//            m_oneCard[0]!=Card_SJ&&
+//            m_oneCard[1]!=Card_BJ&&
             m_oneCard[0]!=m_oneCard[1]&&
             m_twoCard.size()==0&&
             m_threeCard.size()==2&&
             m_threeCard[0]+1==m_threeCard[1]&&
+            m_threeCard.first()>=Card_3&&
+               m_threeCard.last()<=Card_A&&
             m_fourCard.size()==0
             )
     {
@@ -136,6 +140,8 @@ void Hand::DefineHandType()
             m_twoCard.size()==2&&
             m_threeCard.size()==2&&
             m_threeCard[0]+1==m_threeCard[1]&&
+            m_threeCard.first()>=Card_3&&
+               m_threeCard.last()<=Card_A&&
             m_fourCard.size()==0)
     {
         m_handtype=Hand_Plane_Two_Pair;
@@ -148,7 +154,7 @@ void Hand::DefineHandType()
             m_fourCard.size()==0)
     {
         qSort(m_oneCard.begin(),m_oneCard.end());
-        if(m_oneCard.first()>=Card_3&&m_oneCard.last()<=Card_2&&
+        if(m_oneCard.first()>=Card_3&&m_oneCard.last()<=Card_A&&
                 m_oneCard.last()-m_oneCard.first()==(m_oneCard.size()-1))
         {
             m_handtype = Hand_Seq_Single;
@@ -166,7 +172,7 @@ void Hand::DefineHandType()
             )
     {
         qSort(m_twoCard.begin(),m_twoCard.end());
-        if(m_twoCard.first()>=Card_3 && m_twoCard.last()<=Card_2&&
+        if(m_twoCard.first()>=Card_3 && m_twoCard.last()<=Card_A&&
                 m_twoCard.last()-m_twoCard.first()==(m_twoCard.size()-1))
         {
             m_handtype= Hand_Seq_Pair;
@@ -182,6 +188,24 @@ void Hand::DefineHandType()
             m_fourCard.size()==1)
     {
         m_handtype=Hand_Bomb;
+        m_basepoint=m_fourCard[0];
+        m_extra=0;
+    }
+    else if(m_oneCard.size()==2 &&
+            m_twoCard.size()==0&&
+            m_threeCard.size()==0&&
+            m_fourCard.size()==1)
+    {
+        m_handtype=Hand_Quad_Two_Single;
+        m_basepoint=m_fourCard[0];
+        m_extra=0;
+    }
+    else if(m_oneCard.size()==0 &&
+            m_twoCard.size()==1&&
+            m_threeCard.size()==0&&
+            m_fourCard.size()==1)
+    {
+        m_handtype=Hand_Quad_Pair;
         m_basepoint=m_fourCard[0];
         m_extra=0;
     }

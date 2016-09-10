@@ -115,6 +115,90 @@ QList<QList<card> > Method::FindHand(Hand hand, bool beat)
 
         return findCardsArray;
     }
+    /**/
+    else if (handType == Hand_Quad_Two_Single)
+    {
+        QList<QList<card> > findCardsArray;
+
+        CardPoint beginPoint = beat ? CardPoint(basePoint + 1) : CardPoint(Card_Begin + 1);
+        for (CardPoint point = beginPoint; point < Card_End; point = CardPoint(point + 1))
+        {
+            QList<card> findCards = FindSamePointCards(point, 4);
+            if (!findCards.isEmpty())
+            {
+                findCardsArray.append(findCards);
+            }
+        }
+
+        if (!findCardsArray.isEmpty())
+        {
+            QList<card> remainCards = m_cards;
+            for(int i=0;i<findCardsArray.size();i++)
+            {
+                for(int j=0;j<findCardsArray[i].size();j++)
+                    remainCards.removeOne((findCardsArray[i])[j]);
+            }
+            //remainCards.Remove(findCardsArray);
+
+            Method st(m_player, remainCards);
+            QList<QList<card> > oneCardsArray = st.FindHand(Hand(Hand_Single, Card_Begin, 0), false);
+            if (!oneCardsArray.isEmpty())
+            {
+                for (int i = 0; i < findCardsArray.size(); i++)
+                {
+                    findCardsArray[i] .append(oneCardsArray[0]);
+                }
+            }
+            else
+            {
+                findCardsArray.clear();
+            }
+        }
+
+        return findCardsArray;
+    }
+
+        else if (handType == Hand_Quad_Pair)
+        {
+            QList<QList<card> > findCardsArray;
+
+            CardPoint beginPoint = beat ? CardPoint(basePoint + 1) : CardPoint(Card_Begin + 1);
+            for (CardPoint point = beginPoint; point < Card_End; point = CardPoint(point + 1))
+            {
+                QList<card>  findCards = FindSamePointCards(point, 4);
+                if (!findCards.isEmpty())
+                {
+                    findCardsArray << findCards;
+                }
+            }
+
+            if (!findCardsArray.isEmpty())
+            {
+                QList<card>  remainCards = m_cards;
+                for(int i=0;i<findCardsArray.size();i++)
+                    for(int j=0;j<findCardsArray[i].size();j++)
+                        remainCards.removeOne(findCardsArray[i][j]);
+
+                //            remainCards.Remove(findCardsArray);
+
+                Method st(m_player, remainCards);
+                QList<QList<card> > pairCardsArray = st.FindHand(Hand(Hand_Pair, Card_Begin, 0), false);
+                if (!pairCardsArray.isEmpty())
+                {
+                    for (int i = 0; i < findCardsArray.size(); i++)
+                    {
+                        findCardsArray[i].append(pairCardsArray[0]);
+                    }
+                }
+                else
+                {
+                    findCardsArray.clear();
+                }
+            }
+
+            return findCardsArray;
+        }
+        /**/
     else if (handType == Hand_Triple_Pair)
     {
         QList<QList<card> > findCardsArray;

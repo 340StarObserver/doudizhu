@@ -49,6 +49,8 @@ enum HandType
     Hand_Triple,			// 三个
     Hand_Triple_Single,		// 三带一
     Hand_Triple_Pair,		// 三带二
+    Hand_Quad_Two_Single,	// 四带二单
+    Hand_Quad_Pair,	        // 四带一双
     Hand_Plane,				// 飞机，555_666
     Hand_Plane_Two_Single,	// 飞机带两单，555_666_3_4
     Hand_Plane_Two_Pair,	// 飞机带两双，555_666_33_44

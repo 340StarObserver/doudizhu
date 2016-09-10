@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QPainter>
 #include <QSound>
+#include <QCloseEvent>
 #include "cardpicture.h"
 #include "gameprocess.h"
 #include "hand.h"
@@ -55,10 +56,17 @@ public slots:
     void on_continue_clicked();
     void on_tip_clicked();
 
-    void timeDisplay();         //倒数时间显示
+    void on_skill1_clicked();
+    void on_skill2_clicked();
+    void on_skill3_clicked();
 
+    void timeDisplay();         //倒数时间显示
+protected:
+    void closeEvent(QCloseEvent *event);
 private:
     Ui::MainInterface *ui;
+    QLabel * _musicLabel;        //音乐开关标签
+
     QMap<card,CardPicture*> m_Cards;
     QSet<CardPicture*> m_Selected;
     QList<CardPicture*> m_restThreeCards;    //剩余三张牌
@@ -67,12 +75,13 @@ private:
     QPixmap m_cardBasePic;
     QPixmap m_AllCardsPic;
 
+    QLabel* streakslb;
     QLabel* m_rePickingCards;   //重新发牌标识
     QLabel* m_clock;            //闹钟图标
     QLabel* m_timeLabel;        //显示倒数时间
     QTimer* timer;              //叫地主计时器
     int time;                   //倒数时间
-
+    bool autopass=1;
     CardPicture* m_movingcard;
     CardPicture* m_basecard;
 
@@ -91,6 +100,9 @@ private:
     QPushButton* m_pass;
     QPushButton* m_continue;
     QPushButton* m_tip;
+    QPushButton* m_skill1;
+    QPushButton* m_skill2;
+    QPushButton* m_skill3;
 
     /*音效*/
     QSound* shuffleCardsMusic;
@@ -101,6 +113,11 @@ private:
     QSound* noCallMusic;
     QSound* handtype;
 
+    bool eventFilter(QObject * obj, QEvent * event);//事件过滤器
+    bool _isPlayingMusic;
+
+    bool skill1enabled=0;//破釜沉舟技能指示剂
+    bool skill2enabled=0;//夜观星象技能指示剂
 };
 
 #endif // MAININTERFACE_H

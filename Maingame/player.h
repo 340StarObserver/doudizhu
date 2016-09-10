@@ -1,9 +1,13 @@
 #ifndef PLAYER
 #define PLAYER
 
+#include <QWidget>
 #include <vector>
 using std::vector;
 #include <QString>
+#include <QSound>
+#include "card.h"
+#include "hand.h"
 
 //表示自己这个玩家(ok)
 class Player
@@ -15,8 +19,11 @@ private:
     QString _pwd;         //密码
     vector<int> _cards;   //手牌
     vector<int> _tryOut;  //尝试出的牌
+    vector<int> _landLordCards; //地主牌
 private:
     int find(int onecard)const;  //从手牌中查找某张牌的下标(找不到则返回-1)
+    QSound *handtype;
+    QSound *callLandLord;
 public:
     Player();                    //构造
     //get:
@@ -26,7 +33,9 @@ public:
     QString get_Pwd()const;      //获取密码
     vector<int> * getMyCards();  //获取 手牌
     vector<int> * getTryOut();   //获取 尝试出的牌
+    vector<int> * getLandLordCards(); //获取 地主牌
     int * getValues()const;      //获取 尝试出的牌
+    int * getLLCValues()const;
     //set:
     void setID(int ID);                         //设置 编号
     void setHead(int head);                     //设置 头像代号
@@ -34,11 +43,16 @@ public:
     void set_Pwd(const QString& pwd);           //设置密码
     void setCards(const vector<int>& cards);    //设置 手牌
     void setTryOut(const vector<int>& tryOut);  //设置 尝试出的牌
+    void setLandLordCards(const vector<int>& landLordCards); //设置 地主牌
     //functions:
     //从[手牌]中移除[尝试出的牌],并清空[尝试出的牌]
     void actionSuccess();
     //清空[尝试出的牌]
     void actionFailed();
+    //向手牌中加入地主牌 播放叫地主声音
+    void callSuccess();
+    //播放不叫声音
+    void callFailed();
     //当点击第index张手牌,调用此方法,将对应的牌加入[尝试出的牌],但是并不从手牌中移除
     void addOneToTryOut(int index);
     //当又一次点击第index张手牌,调用此方法,将对应的牌从[尝试出的牌]中移除

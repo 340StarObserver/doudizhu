@@ -1,8 +1,10 @@
 #include "infoitem.h"
 #include "ui_infoitem.h"
+#include "universal.h"
 #include <QFont>
 #include <QString>
 #include <QPixmap>
+#include <QDebug>
 
 InfoItem::InfoItem(QWidget *parent) :
     QWidget(parent),

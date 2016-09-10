@@ -11,9 +11,9 @@
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <vector>
-using std::vector;
 #include <QUdpSocket>
 #include <QPaintEvent>
+using namespace std;
 
 namespace Ui {
 class ChatWindow;

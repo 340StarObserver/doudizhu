@@ -2,8 +2,10 @@
 #include "ui_maingame.h"
 #include "clientsocket.h"
 #include "index.h"
+#include "universal.h"
 #include <QPixmap>
 #include <QPainter>
+#include <QDebug>
 #include <QMessageBox>
 
 Maingame::Maingame(int playerID,int head,const QString& user,const QString& pwd,QWidget *parent) :
@@ -12,10 +14,12 @@ Maingame::Maingame(int playerID,int head,const QString& user,const QString& pwd,
 {
     //配置非ui成员的属性:
     originSelf(playerID%3,head%3,user,pwd);//配置[自己]的编号,头像,用户名,密码
-    _canChooseCard=false;                  //一开始无法选中自己的手牌
-    _canAction=false;                      //一开始无法点击 出牌按钮
-    _canGiveUp=false;                      //一开始无法点击 弃权按钮
-    _isFirstChupai=true;                   //是第一次出牌(用来在客户端限制地主一开始弃权过)
+    _canChooseCard=false;                   //一开始无法选中自己的手牌
+    _canAction=false;                       //一开始无法点击 出牌按钮
+    _canGiveUp=false;                       //一开始无法点击 弃权按钮
+    _canJiaodizhu=false;                    //一开始无法点击 叫地主按钮
+    _canBujiao=false;                       //一开始无法点击 不叫按钮
+    _isFirstChupai=false;                   //是第一次出牌(用来在客户端限制地主一开始弃权过)
     //配置ui成员的属性:
     originWindow();               //初始化窗体
     originStartWar();             //初始化开战标签
@@ -49,7 +53,7 @@ void Maingame::originSelf(int playerID,int head,const QString& user,const QStrin
 //初始化窗体的属性
 void Maingame::originWindow()
 {
-    setFixedSize(1024,600);
+    setFixedSize(800*universal::setpix,600*universal::setpix);
 }
 
 //配置背景
@@ -64,7 +68,7 @@ void Maingame::paintEvent(QPaintEvent *event)
 void Maingame::originStartWar()
 {
     _startWar=new QLabel(this);
-    _startWar->setGeometry(240,120,260,200);
+    _startWar->setGeometry(240*universal::setpix,120*universal::setpix,260,200);
     _startWar->setAlignment(Qt::AlignCenter);
     QFont font;
     font.setPointSize(60);
@@ -85,7 +89,7 @@ void Maingame::hideStartWarLabel()
 void Maingame::originWaitLabel()
 {
     _waitLabel=new QLabel(this);
-    _waitLabel->setGeometry(262,50,200,40);
+    _waitLabel->setGeometry(262*universal::setpix,50*universal::setpix,200,40);
     _waitLabel->setAlignment(Qt::AlignCenter);
     QFont font;
     font.setPointSize(15);
@@ -103,7 +107,7 @@ void Maingame::originActLabel()
     font.setBold(true);
     //配置 出牌成功标签 的属性
     _actSuccessLabel=new QLabel(this);
-    _actSuccessLabel->setGeometry(220,435,164,30);
+    _actSuccessLabel->setGeometry(220*universal::setpix,435*universal::setpix,164,30);
     _actSuccessLabel->setAlignment(Qt::AlignCenter);
     _actSuccessLabel->setFont(font);
     _actSuccessLabel->setStyleSheet("color:#e8e8e8");
@@ -111,7 +115,7 @@ void Maingame::originActLabel()
     _actSuccessLabel->hide();
     //配置 出牌失败标签 的属性
     _actFailedLabel=new QLabel(this);
-    _actFailedLabel->setGeometry(220,435,164,30);
+    _actFailedLabel->setGeometry(220*universal::setpix,435*universal::setpix,164,30);
     _actFailedLabel->setAlignment(Qt::AlignCenter);
     _actFailedLabel->setFont(font);
     _actFailedLabel->setStyleSheet("color:#e8e8e8");
@@ -119,7 +123,7 @@ void Maingame::originActLabel()
     _actFailedLabel->hide();
     //配置 其他人出牌成败标签 的属性
     _otherChupai=new QLabel(this);
-    _otherChupai->setGeometry(262,50,200,40);
+    _otherChupai->setGeometry(262*universal::setpix,50*universal::setpix,200,40);
     _otherChupai->setAlignment(Qt::AlignCenter);
     _otherChupai->setFont(font);
     _otherChupai->setStyleSheet("color:#e8e8e8");
@@ -148,10 +152,10 @@ void Maingame::hideOtherChupai()
 void Maingame::originChatWindow()
 {
     QLabel * chatback=new QLabel(this);
-    chatback->setGeometry(724,0,300,600);
+    chatback->setGeometry(600*universal::setpix,0,300,600);
     chatback->setStyleSheet("background-color:#999999");
     _chatwindow=new ChatWindow(this);
-    _chatwindow->move(724,0);
+    _chatwindow->move(600*universal::setpix,0);
 }
 
 //初始化玩家信息栏的属性
@@ -171,9 +175,9 @@ void Maingame::originInfoWindows()
     _infowindows[index]->setID(index);
     _infowindows[index]->setHead(_self.getHead());
     //设置三个玩家的信息栏的位置
-    _infowindows[index]->move(604,420);
-    _infowindows[(index+1)%3]->move(504,0);
-    _infowindows[(index+2)%3]->move(100,0);
+    _infowindows[index]->move(604*universal::setpix,420*universal::setpix);
+    _infowindows[(index+1)%3]->move(504*universal::setpix,0);
+    _infowindows[(index+2)%3]->move(100*universal::setpix,0);
 }
 
 //初始化操作栏
@@ -181,23 +185,37 @@ void Maingame::originOps()
 {
     //操作栏背景:
     QLabel * opback=new QLabel(this);
-    opback->setGeometry(0,420,604,50);
+    opback->setGeometry(0,420*universal::setpix,604,50);
     opback->setStyleSheet("border-top:1px solid #e8e8e8");
     QFont font; font.setPointSize(12);
     //出牌按钮:
     _action=new QPushButton(this);
-    _action->setGeometry(90,435,90,30);
+    _action->setGeometry(90*universal::setpix,435*universal::setpix,90,30);
     _action->setText("出牌");
     _action->setFont(font);
     _action->installEventFilter(this);
     _action->hide();
     //弃权过按钮:
     _giveUp=new QPushButton(this);
-    _giveUp->setGeometry(424,435,90,30);
+    _giveUp->setGeometry(424*universal::setpix,435*universal::setpix,90,30);
     _giveUp->setText("弃权");
     _giveUp->setFont(font);
     _giveUp->installEventFilter(this);
     _giveUp->hide();
+    //叫地主按钮
+    _jiaodizhu = new QPushButton(this);
+    _jiaodizhu->setGeometry(90*universal::setpix,435*universal::setpix,90,30);
+    _jiaodizhu->setText("叫地主");
+    _jiaodizhu->setFont(font);
+    _jiaodizhu->installEventFilter(this);
+    _jiaodizhu->hide();
+    //不叫按钮
+    _bujiao =new QPushButton(this);
+    _bujiao->setGeometry(424*universal::setpix,435*universal::setpix,90,30);
+    _bujiao->setText("不叫");
+    _bujiao->setFont(font);
+    _bujiao->installEventFilter(this);
+    _bujiao->hide();
 }
 
 //初始化手牌标签
@@ -245,7 +263,7 @@ void Maingame::originMusic()
 void Maingame::originTimer()
 {
     _timer=new QTimer(this);
-    connect(_timer,SIGNAL(timeout()),this,SLOT(on_timer()));
+    (_timer,SIGNAL(timeout()),this,SLOT(on_timer()));
     _restSeconds=30;
     _timerLabel=new QLabel(this);
     _timerLabel->setGeometry(330,360,50,50);
@@ -385,10 +403,11 @@ bool Maingame::eventFilter(QObject *obj, QEvent *event)
             _canGiveUp=false;
             _canChooseCard=false;
             ClientSocket::getInstance()->sendChupai(_self.getID(),_self.getTryOut()->size(),_self.getValues());
+
         }
         return true;
     }
-    if(obj == _giveUp && event->type()==QEvent::MouseButtonPress && _canGiveUp)
+    if(obj == _giveUp && event->type()==QEvent::MouseButtonPress)
     {
         if(_isFirstChupai && _self.getID()==0)
         {
@@ -403,9 +422,37 @@ bool Maingame::eventFilter(QObject *obj, QEvent *event)
             _canChooseCard=false;
             _self.getTryOut()->clear();
             ClientSocket::getInstance()->sendChupai(_self.getID(),0,_self.getValues());
+
         }
         return true;
     }
+    if(obj == _jiaodizhu && event->type()==QEvent::MouseButtonPress)
+    {
+
+        stopDaojishi();
+        _isFirstChupai=true;
+        _canJiaodizhu=false;
+        _canBujiao=false;
+        _canAction=true;
+        _canGiveUp=false;
+        _jiaodizhu->hide();
+        _bujiao->hide();
+        ClientSocket::getInstance()->sendJiaodizhu(_self.getID(),1,_self.getLLCValues());
+        return true;
+    }
+    if(obj == _bujiao && event->type()==QEvent::MouseButtonPress)
+    {
+
+        stopDaojishi();
+        _isFirstChupai=false;
+        _canJiaodizhu=false;
+        _canBujiao=false;
+        _jiaodizhu->hide();
+        _bujiao->hide();
+        ClientSocket::getInstance()->sendJiaodizhu(_self.getID(),0,_self.getLLCValues());
+        return true;
+    }
+
     if(obj == _musicLabel && event->type()==QEvent::MouseButtonPress)
     {
         if(_isPlayingMusic)
@@ -467,6 +514,9 @@ void Maingame::originSocket()
     connect(cs,SIGNAL(report_Who(int)),this,SLOT(receive_Who(int)));
     connect(cs,SIGNAL(report_Cards(int,int,vector<int>)),this,SLOT(receive_Cards(int,int,vector<int>)));
     connect(cs,SIGNAL(report_ActionFd(bool)),this,SLOT(receive_ActionFd(bool)));
+    connect(cs,SIGNAL(report_WhoCall(int,vector<int>)), this, SLOT(receive_WhoCall(int,vector<int>)));
+    connect(cs,SIGNAL(report_Call(int,bool,vector<int>)),this, SLOT(receive_Call(int,bool,vector<int>)));
+    connect(cs,SIGNAL(report_CallFd(bool/*,vector<int>*/)),this,SLOT(receive_CallFd(bool/*,vector<int>*/)));
     cs->sendEnterRoom(_self.getID());
 }
 
@@ -537,7 +587,9 @@ void Maingame::on_choose(bool res)
     if(res)
     {
         connect(ClientSocket::getInstance(),SIGNAL(report_LoginResult(bool,int,int)),this,SLOT(on_continue(bool,int,int)));
+
         ClientSocket::getInstance()->sendLogin(_self.get_User(),_self.get_Pwd());
+
     }
     else
     {
@@ -572,6 +624,7 @@ void Maingame::on_continue(bool res, int playerID, int head)
         _infowindows[(index+1)%3]->move(504,0);
         _infowindows[(index+2)%3]->move(100,0);
         ClientSocket::getInstance()->sendEnterRoom(playerID);
+
     }
     else
         close();
@@ -587,6 +640,8 @@ void Maingame::restore()
     _otherChupai->hide();
     _action->hide();
     _giveUp->hide();
+    _jiaodizhu->show();
+    _bujiao->show();
     for(int i=0;i<3;i++)
     {
         _box[i]->setStyleSheet("border:0px solid");
@@ -620,15 +675,15 @@ void Maingame::receive_Origin(int landlordID, int num, const vector<int> &cards)
 {
     _self.setCards(cards);
     reDrawMyRegion();
-    _infowindows[landlordID%3]->setIdentify(true);
-    _infowindows[landlordID%3]->setRestCardNum(20);
-    _eachCardNum[landlordID%3]=20;
-    _infowindows[(landlordID+1)%3]->setIdentify(false);
-    _infowindows[(landlordID+1)%3]->setRestCardNum(17);
-    _eachCardNum[(landlordID+1)%3]=17;
-    _infowindows[(landlordID+2)%3]->setIdentify(false);
-    _infowindows[(landlordID+2)%3]->setRestCardNum(17);
-    _eachCardNum[(landlordID+2)%3]=17;
+    _infowindows[0]->setIdentify(false);
+    _infowindows[0]->setRestCardNum(17);
+    _eachCardNum[0]=17;
+    _infowindows[1]->setIdentify(false);
+    _infowindows[1]->setRestCardNum(17);
+    _eachCardNum[1]=17;
+    _infowindows[2]->setIdentify(false);
+    _infowindows[2]->setRestCardNum(17);
+    _eachCardNum[2]=17;
 }
 
 //处理 轮谁出牌的消息
@@ -653,6 +708,7 @@ void Maingame::receive_Who(int who)
     for(int i=0;i<3;i++)
         _box[i]->setStyleSheet("border:0px solid");
     _box[who%3]->setStyleSheet("border:3px solid #111111");
+    qDebug()<<"who"<<who;
     if(who == _self.getID())
     {
         _cardlist[_self.getID()]->clearAll();
@@ -672,6 +728,25 @@ void Maingame::receive_Who(int who)
         _canChooseCard=false;
         _canAction=false;
         _canGiveUp=false;
+    }
+}
+
+void Maingame::receive_WhoCall(int who,const vector<int>& landLordCards)
+{
+    if(who == _self.getID())
+    {
+        _jiaodizhu->setVisible(true);
+        _bujiao->setVisible(true);
+        _canJiaodizhu = true;
+        _canBujiao = true;
+        _self.setLandLordCards(landLordCards);
+    }
+    else
+    {
+        _jiaodizhu->hide();
+        _bujiao->hide();
+        _canJiaodizhu = false;
+        _canBujiao = false;
     }
 }
 
@@ -711,6 +786,29 @@ void Maingame::receive_Cards(int playerID, int num, const vector<int> &cards)
     }
 }
 
+void Maingame::receive_Call(int playerID, bool isCall,const vector<int>& landLordCards)
+{
+    if(isCall)
+    {
+        if(playerID != _self.getID())
+        {
+            _eachCardNum[playerID%3]=_eachCardNum[playerID%3]+3;
+            _infowindows[playerID%3]->setRestCardNum(_eachCardNum[playerID%3]);
+            _infowindows[playerID%3]->setIdentify(true);
+            _infowindows[playerID%3]->setRestCardNum(20);
+            _eachCardNum[playerID%3]=20;
+            _infowindows[(playerID+1)%3]->setIdentify(false);
+            _infowindows[(playerID+1)%3]->setRestCardNum(17);
+            _eachCardNum[(playerID+1)%3]=17;
+            _infowindows[(playerID+2)%3]->setIdentify(false);
+            _infowindows[(playerID+2)%3]->setRestCardNum(17);
+            _eachCardNum[(playerID+2)%3]=17;
+        }
+    }
+}
+
+
+
 //处理 自己出牌成败反馈的消息
 /*
  * 若 res==true:
@@ -747,5 +845,19 @@ void Maingame::receive_ActionFd(bool res)
         _canGiveUp=true;
         _canChooseCard=true;
         startDaojishi();
+    }
+}
+
+void Maingame::receive_CallFd(bool isCall/*,const vector<int>& landLordCards*/)
+{
+    if(isCall)
+    {
+        _self.callSuccess();
+        reDrawMyRegion();
+    }
+    else
+    {
+        _self.callFailed();
+        reDrawMyRegion();
     }
 }

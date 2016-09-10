@@ -1,4 +1,5 @@
 #include "gameprocess.h"
+#include "universal.h"
 #include <QDebug>
 #include <QCoreApplication>
 
@@ -105,22 +106,73 @@ Player* GameProcess::getPrevPlayer()
 }
 
 void GameProcess::getOneCard(Player* player)
-{
+{//发牌进程修改
+    /*if(universal::diff==0)
+    {
+        //for(int s=53;s>4;s--)
+        {
+            player->getCards().append(m_allCards[universal::Pokers]);
+            m_allCards.removeAt(universal::Pokers);
+            universal::Pokers--;
+        }
+    }
+    if(universal::diff==1)*/
+    {
     QTime time;
     time = QTime::currentTime();
     qsrand(time.msec()+time.second()*1000);
-
+    //qDebug()<<m_allCards.size();
     int i = qrand()% (m_allCards.size());
 
     player->getCards().append(m_allCards[i]);
     m_allCards.removeAt(i);
+    }
+}
+
+void GameProcess::getACard(Player *player,int i)
+{
+    if(universal::SingleRole==0)
+    {
+        player->getCards().append(m_allCards[m_allCards.size()-1]);
+        m_allCards.removeAt(m_allCards.size()-1);
+    }
+    else
+    {
+        if(universal::mission==1||universal::mission==3)
+        {
+            player->getCards().append(m_allCards[i]);
+            m_allCards.removeAt(i);
+        }
+        else
+        {
+            int s = qrand()% (m_allCards.size());
+            i=s;
+            player->getCards().append(m_allCards[i]);
+            m_allCards.removeAt(i);
+        }
+    }
 }
 
 void GameProcess::PlayerCallLord(Player *player, int bet)
 {
     emit TellPlayerCallLord(player,bet);
+/*尝试*/
+    if(universal::SingleRole==1)
+    {
+        player->setRole(Player::Lord);
+        player->getNextPlayer()->setRole(Player::Farmer);
+        player->getNextPlayer()->getNextPlayer()->setRole(Player::Farmer);
+//        QTime dieTime = QTime::currentTime().addMSecs(1000);
+//        while( QTime::currentTime() < dieTime )
+//            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 
+        emit TellGameProcess(PlayingHand);
+        beginPlayHand();
+        return;
+    }
 
+    else
+    {
     //叫3分直接当地主
     if(bet==3)
     {
@@ -207,6 +259,7 @@ void GameProcess::PlayerCallLord(Player *player, int bet)
         beginPlayHand();
         return;
     }
+    }
 
     QTime dieTime = QTime::currentTime().addMSecs(1000);
     while( QTime::currentTime() < dieTime )
@@ -217,6 +270,7 @@ void GameProcess::PlayerCallLord(Player *player, int bet)
 
     m_currentPlayer->beginCallingLord();
 }
+
 
 void GameProcess::PlayerPlayHand(Player *player, QList<card> cards)
 {

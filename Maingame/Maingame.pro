@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui multimedia network
+QT       += core gui multimedia network opengl sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,7 +34,15 @@ SOURCES += main.cpp\
     wanjia.cpp \
     gameoverframe.cpp \
     cardlist.cpp \
-    maininterface.cpp
+    maininterface.cpp \
+    settings.cpp \
+    universal.cpp \
+    simplemethod.cpp \
+    shop.cpp \
+    single.cpp \
+    singlesl.cpp \
+    missioninfo.cpp \
+    mselect.cpp
 
 HEADERS  += maingame.h \
     gamesound.h \
@@ -58,7 +66,15 @@ HEADERS  += maingame.h \
     wanjia.h \
     gameoverframe.h \
     cardlist.h \
-    maininterface.h
+    maininterface.h \
+    settings.h \
+    universal.h \
+    simplemethod.h \
+    shop.h \
+    single.h \
+    singlesl.h \
+    missioninfo.h \
+    mselect.h
 
 FORMS    += maingame.ui \
     login.ui \
@@ -70,7 +86,13 @@ FORMS    += maingame.ui \
     gamepanel.ui \
     gameoverframe.ui \
     cardlist.ui \
-    maininterface.ui
+    maininterface.ui \
+    settings.ui \
+    shop.ui \
+    single.ui \
+    singlesl.ui \
+    missioninfo.ui \
+    mselect.ui
 
 RESOURCES += \
     res.qrc \
