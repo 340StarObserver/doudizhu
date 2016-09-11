@@ -1,11 +1,11 @@
 #include "cardpicture.h"
-
+#include "universal.h"
 
 CardPicture::CardPicture(QWidget *parent) : QWidget(parent)
 {
     m_turn= false;
     m_selected= false;
-    QPixmap pic(":/img/res/card2.png");
+    QPixmap pic(/*":/img/res/card3.png"*/universal::theme);
     m_back= pic.copy(2*80,4*105,80,105);
 }
 

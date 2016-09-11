@@ -5,6 +5,7 @@
 #include <QThread>
 #include "wanjia.h"
 #include "method.h"
+#include "simplemethod.h"
 
 
 class Robot:public Player

@@ -1,8 +1,11 @@
 #include "maininterface.h"
 #include "ui_maininterface.h"
+#include "universal.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QApplication>
+#include <QMovie>
+#include "index.h"
 
 #define card_width 80
 #define card_height 105
@@ -11,11 +14,14 @@ MainInterface::MainInterface(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainInterface)
 {
+    universal::SingleRole=0;
     ui->setupUi(this);
     setWindowTitle("斗地主游戏");
-    setFixedSize(1000,650);
+    setFixedSize(800*universal::setpix,600*universal::setpix);
+    if(!universal::windowed)
+        setWindowState( Qt::WindowFullScreen );
     m_gameprocess = new GameProcess(this);
-
+    qDebug()<<universal::diff;
     Init();
     InitCardsMap();
 
@@ -38,18 +44,36 @@ MainInterface::~MainInterface()
 void MainInterface::Init()
 {
     QFont ft;
+    ft.setFamily("OCR A Extended");
     ft.setPointSize(30);
     QPalette pa;
-    pa.setColor(QPalette::WindowText,Qt::white);
+    pa.setColor(QPalette::WindowText,Qt::gray);
 
     time=20;
     MoveDistance=0;
     m_pickingCardTimer=new QTimer(this);
-    m_pickingCardTimer->setInterval(8);
+    if(!universal::debugmode)
+        m_pickingCardTimer->setInterval(8);
+    else
+        m_pickingCardTimer->setInterval(0);
     connect(m_pickingCardTimer,SIGNAL(timeout()),this,SLOT(PickingCards()));
 
+    /*****设置音效开关***********/
+    _musicLabel=new QLabel(this);
+    _musicLabel->setGeometry(360*universal::setpix,15*universal::setpix,30,30);
+    //_musicLabel->setText("音效开关");
+    if(universal::theme==":/img/res/card2.png")
+        _musicLabel->setPixmap(QPixmap(":/image/res/pause.png"));
+    else
+        _musicLabel->setPixmap(QPixmap(":/img/res/pausemd.png"));
+    _musicLabel->installEventFilter(this);
+   //_musicLabel->show();
+    //_musicLabel->raise();
+//    bkMusic->play();
+//    bkMusic->setLoops(QSound::Infinite);
+
     /*****设置移动的牌和放在中间不动的牌***********/
-    m_AllCardsPic.load(":/img/res/card2.png");
+    m_AllCardsPic.load(/*":/img/res/card3.png"*/universal::theme);
     m_cardBackPic = m_AllCardsPic.copy(160,4*105,80,105);
     m_basecardPos = QPoint( (width()-card_width)/2, height()/2-100 );
     m_movingcard=new CardPicture(this);
@@ -61,7 +85,14 @@ void MainInterface::Init()
 
     //闹钟图片
     m_clock=new QLabel(this);
-    m_clock->setPixmap(QPixmap(":/img/res/clock.png"));
+    if(universal::mclock==":/img/res/timec.gif")
+    {
+        QMovie *movie = new QMovie(":/img/res/timec.gif");
+        m_clock->setMovie(movie);
+        movie->start();
+    }
+    else
+        m_clock->setPixmap(QPixmap(/*":/img/res/clock.png"*/universal::mclock));
     m_clock->move((width()-m_clock->width())/2+20,(height()-m_clock->width())/2-50);
     m_clock->hide();
 
@@ -75,8 +106,17 @@ void MainInterface::Init()
     m_timeLabel=new QLabel(this);
     m_timeLabel->setFont(ft);
     m_timeLabel->setPalette(pa);
+
     m_timeLabel->move(490,350);
     m_timeLabel->hide();
+
+    streakslb=new QLabel(this);
+    streakslb->setFont(ft);
+    streakslb->setPalette(pa);
+    streakslb->setText("连胜："+QString::number(universal::streak));
+
+    streakslb->move(550*universal::setpix,10);
+    streakslb->hide();
 
     timer=new QTimer(this);
     timer->setInterval(1000);
@@ -119,19 +159,40 @@ void MainInterface::Init()
     m_playhand=new QPushButton(this);
     m_pass = new QPushButton(this);
     m_tip = new QPushButton(this);
+    m_skill1 = new QPushButton(this);
+    m_skill2 = new QPushButton(this);
+    m_skill3 = new QPushButton(this);
     m_playhand->hide();
     m_pass->hide();
     m_tip->hide();
+    m_skill1->hide();
+    m_skill2->hide();
+    m_skill3->hide();
     m_playhand->setText("出牌");
     m_pass->setText("要不起");
     m_tip->setText("提示");
+    m_skill1->setText("破釜沉舟"+QString::number(universal::skill1));
+    m_skill2->setText("夜观星象"+QString::number(universal::skill2));
+    m_skill3->setText("横扫千军"+QString::number(universal::skill3));
     m_pass->move(width()/2-120,height()-card_height-40);
     m_playhand->move(width()/2-20,height()-card_height-40);
     m_tip->move(width()/2+80,height()-card_height-40);
+    double hi=0.0;
+    if(universal::setpix>1.5)
+        hi=1.5;
+    else
+        hi=universal::setpix;
+    m_skill1->move(700*universal::setpix,500*hi);
+    m_skill2->move(700*universal::setpix,540*hi);
+    m_skill3->move(700*universal::setpix,580*hi);
 
     connect(m_playhand,SIGNAL(clicked()),this,SLOT(on_playhand_clicked()));
     connect(m_pass,SIGNAL(clicked()),this,SLOT(on_pass_clicked()));
     connect(m_tip,SIGNAL(clicked()),this,SLOT(on_tip_clicked()));
+    ////增加道具功能
+    connect(m_skill1,SIGNAL(clicked()),this,SLOT(on_skill1_clicked()));
+    connect(m_skill2,SIGNAL(clicked()),this,SLOT(on_skill2_clicked()));
+    connect(m_skill3,SIGNAL(clicked()),this,SLOT(on_skill3_clicked()));
 
     /*继续按钮*/
     m_continue= new QPushButton(this);
@@ -150,6 +211,7 @@ void MainInterface::Init()
     callLordMusic=new QSound(":/sound/res/jiaodizhu.wav",this);
     bkMusic->play();
     bkMusic->setLoops(-1);
+    _isPlayingMusic=1;
 
     /*叫分标识*/
     m_gameprocess->getDownPlayer()->betLabel=new QLabel(this);
@@ -191,15 +253,15 @@ void MainInterface::Init()
 
     /*角色标识*/
     m_gameprocess->getDownPlayer()->roleLabel=new QLabel(this);
-    m_gameprocess->getDownPlayer()->roleLabel->move(700,400);
+    m_gameprocess->getDownPlayer()->roleLabel->move(600*universal::setpix,500*universal::setpix);
     m_gameprocess->getDownPlayer()->roleLabel->hide();
 
     m_gameprocess->getLeftPlayer()->roleLabel=new QLabel(this);
-    m_gameprocess->getLeftPlayer()->roleLabel->move(110,50);
+    m_gameprocess->getLeftPlayer()->roleLabel->move(10*universal::setpix,10*universal::setpix);
     m_gameprocess->getLeftPlayer()->roleLabel->hide();
 
     m_gameprocess->getRightPlayer()->roleLabel=new QLabel(this);
-    m_gameprocess->getRightPlayer()->roleLabel->move(820,50);
+    m_gameprocess->getRightPlayer()->roleLabel->move(730*universal::setpix,10*universal::setpix);
     m_gameprocess->getRightPlayer()->roleLabel->hide();
 
 }
@@ -239,8 +301,47 @@ void MainInterface::timeDisplay()
 
     if(time<1)
     {
+        //超时时自动打出提示的牌
         timer->stop();
+        /*{
+             m_Selected.clear();
+            CardPicture* cardpic;
+            foreach(cardpic,m_Selected)
+                cardpic->setSelected(false);
 
+            m_Selected.clear();
+            Method st(m_gameprocess->getDownPlayer(),m_gameprocess->getDownPlayer()->getCards());
+            QList<card> cards = st.MakeDecision();
+            card c;
+            foreach(c,cards)
+            {
+                m_Selected.insert(m_Cards.value(c));
+            }
+
+            foreach(cardpic,m_Selected)
+            {
+                cardpic->setSelected(true);
+            }
+
+            UpdateCards(m_gameprocess->getDownPlayer());
+            PlayerStartPlayingHand();
+            {
+            CardPicture* cardpic;
+            foreach(cardpic,m_Selected)
+                cardpic->setSelected(false);
+            m_Selected.clear();
+            UpdateCards(m_gameprocess->getDownPlayer());
+
+            m_gameprocess->getDownPlayer()->playHand(QList<card>());
+            }
+        }*/
+        //重写超时自动出牌功能
+        autopass=1;
+        on_tip_clicked();
+        on_playhand_clicked();
+        qDebug()<<"超时自动出牌";
+        if(autopass==1)
+            on_pass_clicked();
     }
     else
     {
@@ -250,6 +351,56 @@ void MainInterface::timeDisplay()
     }
 
 
+}
+
+void MainInterface::closeEvent(QCloseEvent *event)
+{
+    qDebug()<<"close";
+    {
+    QMessageBox::StandardButton button;
+        button = QMessageBox::question(this, tr("退出程序"),
+            QString(tr("警告：游戏正在进行中，是否强制退出?")),
+            QMessageBox::Yes | QMessageBox::No);
+
+        if (button == QMessageBox::No) {
+            event->ignore();  //忽略退出信号，程序继续运行
+        }
+        else if (button == QMessageBox::Yes) {
+            //bkMusic->stop();
+            deleteLater();
+            Index * newPage=new Index;
+            newPage->setWindowTitle("首页");
+            newPage->show();
+            event->accept();  //接受退出信号，程序退出
+        }
+    }
+}
+
+bool MainInterface::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj == _musicLabel && event->type()==QEvent::MouseButtonPress)
+    {
+        if(_isPlayingMusic)
+        {
+            bkMusic->stop();
+            if(universal::theme==":/img/res/card2.png")
+                _musicLabel->setPixmap(QPixmap(":/image/res/play.png"));
+            else
+                _musicLabel->setPixmap(QPixmap(":/img/res/playmd.png"));
+            _isPlayingMusic=false;
+        }
+        else
+        {
+            bkMusic->play();
+            if(universal::theme==":/img/res/card2.png")
+                _musicLabel->setPixmap(QPixmap(":/image/res/pause.png"));
+            else
+                _musicLabel->setPixmap(QPixmap(":/img/res/pausemd.png"));
+            _isPlayingMusic=true;
+        }
+        return true;
+    }
+    return QWidget::eventFilter(obj,event);
 }
 
 void MainInterface::CutCardPic(int x,int y,card c)
@@ -270,6 +421,7 @@ void MainInterface::StartProcess(GameProcess::GameStatus status)
     switch(status)
     {
     case (GameProcess::PickingCard):
+        /*//在此更改debug模式*/
         shuffleCardsMusic->play();
         shuffleCardsMusic->setLoops(-1);
         ReStart();
@@ -289,27 +441,31 @@ void MainInterface::StartProcess(GameProcess::GameStatus status)
     case (GameProcess::PlayingHand):
         m_gameprocess->m_gamestatus=GameProcess::PlayingHand;
         m_clock->hide();
+        streakslb->show();
         //角色标识
         if(m_gameprocess->getDownPlayer()->getRole()==Player::Lord)
-            m_gameprocess->getDownPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/lord.png"));
+            m_gameprocess->getDownPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/lord.png"*/universal::playerd));
         else
-            m_gameprocess->getDownPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/farmer.png"));
+            m_gameprocess->getDownPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/farmer.png"*/universal::playera));
 
         m_gameprocess->getDownPlayer()->roleLabel->show();
+        m_gameprocess->getDownPlayer()->roleLabel->raise();
 
         if(m_gameprocess->getLeftPlayer()->getRole()==Player::Lord)
-            m_gameprocess->getLeftPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/lord.png"));
+            m_gameprocess->getLeftPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/lord.png"*/universal::playerd));
         else
-            m_gameprocess->getLeftPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/farmer.png"));
+            m_gameprocess->getLeftPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/farmer.png"*/universal::playera));
 
         m_gameprocess->getLeftPlayer()->roleLabel->show();
+        m_gameprocess->getLeftPlayer()->roleLabel->raise();
 
         if(m_gameprocess->getRightPlayer()->getRole()==Player::Lord)
-            m_gameprocess->getRightPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/lord.png"));
+            m_gameprocess->getRightPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/lord.png"*/universal::playerd));
         else
-            m_gameprocess->getRightPlayer()->roleLabel->setPixmap(QPixmap(":/img/res/farmer.png"));
+            m_gameprocess->getRightPlayer()->roleLabel->setPixmap(QPixmap(/*":/img/res/farmer.png"*/universal::playera));
 
         m_gameprocess->getRightPlayer()->roleLabel->show();
+        m_gameprocess->getRightPlayer()->roleLabel->raise();
 
         m_bet0->hide();
         m_bet1->hide();
@@ -329,7 +485,7 @@ void MainInterface::StartProcess(GameProcess::GameStatus status)
             cardpic->setPic(m_Cards.value(restthreecards[i])->getPic());
 
             m_restThreeCards.append(cardpic);
-            m_restThreeCards[i]->move(360+i*100,5);
+            m_restThreeCards[i]->move((280+i*100)*universal::setpix,5);
             m_restThreeCards[i]->setTurn(true);
             m_restThreeCards[i]->show();
         }
@@ -388,6 +544,38 @@ void MainInterface::SetPlayerStatus(Player *player, Player::PlayerStatus status)
             }
             m_playhand->show();
             m_tip->show();
+            if(universal::_skills==1)
+            {
+                m_skill1->show();
+                /*
+                //在无人出牌时，阻止使用破釜沉舟技能，防止错误发生
+                if(m_gameprocess->getHitPlayer()==NULL)
+                {
+                    m_skill1->setEnabled(false);
+                }
+                else
+                {
+                    m_skill1->setEnabled(true);
+                }
+                */
+                m_skill3->show();
+                if(!skill2enabled)
+                    m_skill2->show();
+                {
+                    if(universal::skill1>0)
+                        m_skill1->setEnabled(true);
+                    else
+                        m_skill1->setEnabled(false);
+                    if(universal::skill2>0)
+                        m_skill2->setEnabled(true);
+                    else
+                        m_skill2->setEnabled(false);
+                    if(universal::skill3>0)
+                        m_skill3->setEnabled(true);
+                    else
+                        m_skill3->setEnabled(false);
+                }
+            }
 
         }
         else
@@ -399,17 +587,23 @@ void MainInterface::SetPlayerStatus(Player *player, Player::PlayerStatus status)
             m_tip->hide();
             m_pass->hide();
             m_playhand->hide();
+            m_skill1->hide();
+            m_skill2->hide();
+            m_skill3->hide();
         }
     }
     else if(status==Player::winning)
     {
+        m_skill1->hide();
+        m_skill2->hide();
+        m_skill3->hide();
         m_playhand->hide();
         m_pass->hide();
         m_tip->hide();
         m_clock->hide();
         m_timeLabel->hide();
         timer->stop();
-
+        bkMusic->stop();
         //翻转显示场上剩余牌
         card c;
         foreach(c,m_gameprocess->getDownPlayer()->getCards())
@@ -427,11 +621,14 @@ void MainInterface::SetPlayerStatus(Player *player, Player::PlayerStatus status)
         if(player->getRole()==m_gameprocess->getDownPlayer()->getRole())
         {
             winMusic->play();
-            QMessageBox::about(this,tr("结果"),tr("你赢了!"));
+            universal::streak++;
+            universal::scores+=universal::streak*2;
+            QMessageBox::about(this,"结果","你赢了!获得积分"+QString::number(universal::streak*2)+"分");
         }
         else
         {
             loseMusic->play();
+            universal::streak=0;
             QMessageBox::about(this,tr("结果"),tr("你输了!"));
         }
 
@@ -442,7 +639,7 @@ void MainInterface::SetPlayerStatus(Player *player, Player::PlayerStatus status)
 
 void MainInterface::on_start_clicked()
 {
-    bkMusic->stop();
+    //bkMusic->stop();
     m_start->hide();                            //隐藏开始按钮
     StartProcess(GameProcess::PickingCard);     //执行发牌进程
 }
@@ -450,9 +647,21 @@ void MainInterface::on_start_clicked()
 void MainInterface::PickingCards()
 {
     Player* curPlayer=m_gameprocess->getCurrentPlayer();
-    if(MoveDistance>270)
-    {
-        m_gameprocess->getOneCard(curPlayer);
+    Player* dp=m_gameprocess->getDownPlayer();
+    //Player* downPlayer=m_gameprocess->getDownPlayer();
+    if(MoveDistance>360)//ori270
+    {//发牌开始
+        if(universal::diff==0)
+        {
+            if(curPlayer==dp)////调节easy难度
+            {
+                m_gameprocess->getACard(curPlayer);
+            }
+            else
+                m_gameprocess->getOneCard(curPlayer);
+        }
+        else
+            m_gameprocess->getOneCard(curPlayer);
         MoveDistance=0;
         UpdateCards(curPlayer);
 
@@ -475,7 +684,7 @@ void MainInterface::PickingCards()
     }
     else
     {
-        MoveDistance+=14;
+        MoveDistance+=12;
         PickingCardsAnimation(curPlayer);
     }
 }
@@ -484,17 +693,17 @@ void MainInterface::PickingCardsAnimation(Player* player)
 {
 
     if(player == m_gameprocess->getLeftPlayer())
-        m_movingcard->move(m_basecardPos.x()-MoveDistance*1.5,m_basecardPos.y());
+        m_movingcard->move(m_basecardPos.x()-MoveDistance*0.9*universal::setpix,m_basecardPos.y());
     if(player == m_gameprocess->getRightPlayer())
-        m_movingcard->move(MoveDistance*1.5+m_basecardPos.x(),m_basecardPos.y());
+        m_movingcard->move(MoveDistance*0.9*universal::setpix+m_basecardPos.x(),m_basecardPos.y());
     if(player == m_gameprocess->getDownPlayer())
-        m_movingcard->move(m_basecardPos.x(),m_basecardPos.y()+MoveDistance);
+        m_movingcard->move(m_basecardPos.x(),m_basecardPos.y()+MoveDistance*universal::setpix*0.8);
 }
 
 void MainInterface::paintEvent(QPaintEvent *event)
 {
     /*画背景图*/
-    QPixmap bk(":/img/res/bk.png");
+    QPixmap bk(/*":/img/res/bk.png"*/universal::bgp);
     QPainter painter(this);
     painter.drawPixmap(this->rect(),bk);
 }
@@ -629,23 +838,30 @@ void MainInterface::PlayerStartPlayingHand()
 
     /****************判断是否能打出*********************/
     Hand hand(cards);
-    //未知牌型不能出
-    if( hand.getHandType() == Hand_Unknown )
-    {
-        qDebug()<<"Unkown HandType";
-        return;
-    }
 
     //打不过不能出
-    Hand handToHit(m_gameprocess->getHitCards());
-    Player* hitPlayer=m_gameprocess->getHitPlayer();
-    if(hitPlayer!=m_gameprocess->getDownPlayer()&&hitPlayer!=NULL)
-        if(!hand.Defeat(handToHit))
+    if(!skill1enabled)
+    {
+        //未知牌型不能出
+        if( hand.getHandType() == Hand_Unknown )
         {
-            qDebug()<<"Cannot Defeat";
+            qDebug()<<"Unknown HandType";
             return;
         }
-
+        Hand handToHit(m_gameprocess->getHitCards());
+        Player* hitPlayer=m_gameprocess->getHitPlayer();
+        if(hitPlayer!=m_gameprocess->getDownPlayer()&&hitPlayer!=NULL)
+            if(!hand.Defeat(handToHit))
+            {
+                qDebug()<<"Cannot Defeat";
+                return;
+            }
+        autopass=0;
+        qDebug()<<"出牌成功";
+    }
+    else
+        if(skill1enabled)
+            skill1enabled=0;
 
     /****************************************/
     m_Selected.clear();
@@ -677,6 +893,13 @@ void MainInterface::PlayingHand(Player* player,QList<card> cards)
         break;
     case Hand_Triple_Pair:
         handtype=new QSound(":/sound/res/sandaiyidui.wav",this);
+        break;
+        /**/
+    case Hand_Quad_Two_Single:
+        handtype=new QSound(":/sound/res/sidaier.wav",this);
+        break;
+    case Hand_Quad_Pair:
+        handtype=new QSound(":/sound/res/sidaier.wav",this);
         break;
     case Hand_Plane:
     case Hand_Plane_Two_Single:
@@ -894,6 +1117,7 @@ void MainInterface::on_pass_clicked()
 
 void MainInterface::on_continue_clicked()
 {
+    bkMusic->play();
     StartProcess(GameProcess::PickingCard);
 }
 
@@ -918,6 +1142,70 @@ void MainInterface::on_tip_clicked()
     }
 
     UpdateCards(m_gameprocess->getDownPlayer());
+}
+
+void MainInterface::on_skill1_clicked()
+{
+    QMessageBox::StandardButton rb =QMessageBox::question(NULL,"破釜沉舟","使用此技能，可以打出任意牌型<font color='red'>!</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    {
+        if (rb==QMessageBox::Yes)
+            {
+            universal::skill1--;
+            skill1enabled=1;
+            m_skill1->setText("破釜沉舟"+QString::number(universal::skill1));
+            m_skill1->hide();
+            qDebug()<<"accepted";
+        }
+        else
+        {
+            qDebug()<<"cancaled";
+        }
+    }
+}
+
+void MainInterface::on_skill2_clicked()
+{
+    QMessageBox::StandardButton rb =QMessageBox::question(NULL,"夜观星象","使用此技能，你将看到对手所有手牌<font color='red'>!</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    {
+        if (rb==QMessageBox::Yes)
+            {
+            universal::skill2--;
+            skill2enabled=1;
+            card c;
+            foreach(c,m_gameprocess->getLeftPlayer()->getCards())
+                m_Cards.value(c)->setTurn(true);
+            foreach(c,m_gameprocess->getRightPlayer()->getCards())
+                m_Cards.value(c)->setTurn(true);
+
+            UpdateCards(m_gameprocess->getLeftPlayer());
+            UpdateCards(m_gameprocess->getRightPlayer());
+            m_skill2->setText("夜观星象"+QString::number(universal::skill2));
+            m_skill2->hide();
+            qDebug()<<"accepted";
+        }
+        else
+        {
+            qDebug()<<"cancaled";
+        }
+    }
+}
+
+void MainInterface::on_skill3_clicked()
+{
+    QMessageBox::StandardButton rb =QMessageBox::question(NULL,"横扫千军","使用此技能，你将直接获胜<font color='red'>!</font>", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    {
+        if (rb==QMessageBox::Yes)
+            {
+            universal::skill3--;
+            SetPlayerStatus(m_gameprocess->getCurrentPlayer(),Player::winning);
+            m_skill3->setText("横扫千军"+QString::number(universal::skill3));
+            qDebug()<<"accepted";
+        }
+        else
+        {
+            qDebug()<<"cancaled";
+        }
+    }
 }
 
 void MainInterface::ReStart()

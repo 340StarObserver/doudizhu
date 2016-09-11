@@ -21,6 +21,7 @@ public:
     GameProcess(QWidget *parent = 0);
 
     void getOneCard(Player* player);                 //添加一张牌到当前玩家的牌组中
+    void getACard(Player* player, int size=0);
     void setCurrentPlayer(Player* player);
     Player* getLeftPlayer();
     Player* getRightPlayer();

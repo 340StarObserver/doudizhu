@@ -4,6 +4,9 @@
 #include "datatype.h"
 #include <QDataStream>
 #include <fstream>
+#include <QDebug>
+#include <vector>
+using std::vector;
 using std::ifstream;
 using std::ios_base;
 #include <string>
@@ -14,8 +17,11 @@ ClientSocket * ClientSocket::_instance=NULL;
 
 //初始化配置文件,游戏IP,注册IP,游戏端口,注册端口
 char * ClientSocket::_configFile="config.txt";
-QString ClientSocket::_gameIP="223.3.81.190";
-QString ClientSocket::_regiIP="223.3.81.190";
+
+//QString ClientSocket::_gameIP=" 127.0.0.1";
+//QString ClientSocket::_regiIP=" 127.0.0.1";
+QString ClientSocket::_gameIP="  127.0.0.1";
+QString ClientSocket::_regiIP="  127.0.0.1";
 quint16 ClientSocket::_GamePort=3400;
 quint16 ClientSocket::_RegistPort=3910;
 
@@ -33,6 +39,7 @@ ClientSocket * ClientSocket::getInstance()
     if(_instance == NULL)
         _instance=new ClientSocket();
     return _instance;
+
 }
 
 //删除单例
@@ -73,8 +80,9 @@ void ClientSocket::readConfig()
     }
     else
     {
-        _gameIP="223.3.81.190";
-        _regiIP="223.3.81.190";
+        _gameIP="  127.0.0.1";
+        _regiIP="  127.0.0.1";
+
         _GamePort=3400;
         _RegistPort=3910;
     }
@@ -106,6 +114,7 @@ void ClientSocket::sendRegist(const QString &user, const QString &pwd, int head)
 */
 void ClientSocket::sendLogin(const QString &user, const QString &pwd)
 {
+    qDebug()<<"sendlogin"<<user<<pwd;
     _socket->connectToHost(QHostAddress(_gameIP),_GamePort);
     _socket->write(DataPackage::login(user,pwd));
 }
@@ -132,6 +141,11 @@ void ClientSocket::sendChupai(int playerID, int num, int cards[])
     _socket->write(DataPackage::chupai(playerID,num,cards));
 }
 
+void ClientSocket::sendJiaodizhu(int playerID, bool isCall,int landLordCards[])
+{
+    _socket->write(DataPackage::jiaodizhu(playerID, isCall,landLordCards));
+}
+
 //配置套接字的信号槽关联(在进入登陆界面时调用)
 void ClientSocket::setSignals()
 {
@@ -152,8 +166,13 @@ void ClientSocket::cancelSignals()
 */
 void ClientSocket::onReadyRead()
 {
+    qDebug() <<"onReadyRead-----------";
+
     QDataStream in(_socket);
-    in.setVersion(QDataStream::Qt_5_5);
+    in.setVersion(QDataStream::Qt_5_2);
+
+    qDebug() <<_datasize << "aaaaaaaaaaaaaa";
+
     if(_datasize == 0){
         if(_socket->bytesAvailable() < sizeof(quint16))
             return;
@@ -163,6 +182,9 @@ void ClientSocket::onReadyRead()
         return;
     int type;
     in>>type;
+
+    qDebug() << type << "onReadyRead";
+
     //判断报文的类型:
     switch(type)
     {
@@ -253,9 +275,47 @@ void ClientSocket::onReadyRead()
         emit report_ActionFd(res);
         break;
     }
+    case DataType::CallLord:{
+        int id,tmp;
+        bool isCall;
+        vector<int> landLordCards;
+        in>>id;
+        in>>isCall;
+        for(int i=0;i<3;i++){
+            in>>tmp;
+            landLordCards.push_back(tmp);
+        }
+        emit report_Call(id,isCall,landLordCards);
+        break;
+    }
+    case DataType::CallFeedBack:{
+        bool isCall;
+//        int tmp;/*
+//        vector<int> landLordCards;*/
+        in>>isCall;
+//        for(int i=0;i<3;i++){
+//            in>>tmp;
+//            landLordCards.push_back(tmp);
+//        }
+        emit report_CallFd(isCall/*, landLordCards*/);
+        break;
+    }
+    case DataType::WhoCall:{
+        int id,tmp;
+        vector<int>landLordCards;
+        in>>id;
+        for(int i=0;i<3;i++){
+            in>>tmp;
+            landLordCards.push_back(tmp);
+        }
+        emit report_WhoCall(id,landLordCards);
+        break;
+    }
     }
     //递归接收报文
     _datasize=0;
     if(_socket->bytesAvailable() > 0)
         onReadyRead();
 }
+
+

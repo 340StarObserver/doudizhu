@@ -5,6 +5,20 @@
         <file>res/clock.png</file>
         <file>res/lord.png</file>
         <file>res/farmer.png</file>
+        <file>res/card3.png</file>
+        <file>res/pause1.png</file>
+        <file>res/card4.png</file>
+        <file>res/card5.png</file>
+        <file>res/lordwa.png</file>
+        <file>res/bkwa.jpg</file>
+        <file>res/bkc.jpg</file>
+        <file>res/farmerc.png</file>
+        <file>res/bkseu.jpg</file>
+        <file>res/ssaa4.jpg</file>
+        <file>res/ssaa16.jpg</file>
+        <file>res/timec.gif</file>
+        <file>res/pausemd.png</file>
+        <file>res/playmd.png</file>
     </qresource>
     <qresource prefix="/sound">
         <file>res/win.wav</file>
@@ -50,5 +64,7 @@
         <file>res/loseMusic.wav</file>
         <file>res/planeMusic.wav</file>
         <file>res/bkMusic.wav</file>
+        <file>res/sidaier.wav</file>
+        <file>res/sidailiangdui.wav</file>
     </qresource>
 </RCC>

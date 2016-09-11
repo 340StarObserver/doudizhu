@@ -35,5 +35,6 @@
         <file>res/card.png</file>
         <file>res/win.gif</file>
         <file>res/lose.gif</file>
+        <file>res/settings.jpg</file>
     </qresource>
 </RCC>

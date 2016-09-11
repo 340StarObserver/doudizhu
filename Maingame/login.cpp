@@ -139,13 +139,13 @@ void Login::originButtons()
 }
 
 //校验输入数据合法性(利用正则)
-//要求用户名是14级的学号,密码是14级的一卡通
+//要求用户名是15级的学号,密码是15级的一卡通
 bool Login::checkDataValid()const
 {
     QString user=accountLineEdit->text();
     QString pwd=passwordLineEdit->text();
-    QRegExp rx1("^\\d{2}[a-z0-9A-Z]{1}14\\d{3}");
-    QRegExp rx2("21314\\d{4}");
+    QRegExp rx1("^\\d{2}[a-z0-9A-Z]{1}15\\d{3}");
+    QRegExp rx2("21315\\d{4}");
     return rx1.indexIn(user)==0 && rx2.indexIn(pwd)==0;
 }
 

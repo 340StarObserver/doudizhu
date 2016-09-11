@@ -1,4 +1,5 @@
 #include "robot.h"
+#include "universal.h"
 #include <QThread>
 #include <QTime>
 #include <QCoreApplication>
@@ -8,8 +9,15 @@ Robot::Robot(QWidget* parent):Player(parent)
 
 void Robot::beginPlayingHand()
 {
-    Method method(this,m_cards);
+    Method method(this, m_cards);
+
+    if(universal::diff==2)
+        Method method(this,m_cards);
+    else
+        simpleMethod method(this,m_cards);
+
     QList<card> cards = method.MakeDecision();   //智能获取要出的牌
+
 
     QTime dieTime = QTime::currentTime().addMSecs(1000);
     while( QTime::currentTime() < dieTime )
@@ -21,8 +29,13 @@ void Robot::beginPlayingHand()
 void Robot::beginCallingLord()
 {
     int weight = 0;
-
     Method st(this, m_cards);
+
+    if(universal::diff==2)
+        Method st(this, m_cards);
+    else
+        simpleMethod st(this, m_cards);
+
     weight += st.GetRangeCards(Card_SJ, Card_BJ).size() * 6;
     int count=0;
     for(int i=0;i<m_cards.size();i++)
@@ -41,6 +54,11 @@ void Robot::beginCallingLord()
 
     //	left.Remove(optSeq);
     Method stLeft(this, left);
+
+    if(universal::diff==2)
+        Method stLeft(this, left);
+    else
+        simpleMethod stLeft(this, left);
 
     QList<QList<card> > bombs = stLeft.FindCardsByCount(4);
     weight += bombs.size() * 5;

@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QString>
+#include <QDebug>
 #include <vector>
 using std::vector;
 
@@ -35,6 +36,12 @@ signals:  //这些信号 用来 向ui层报告网络层解析出的数据
     void report_Cards(int playerID,int num,const vector<int>& cards);
     //报告 出牌反馈
     void report_ActionFd(bool res);
+    //报告 轮谁叫地主
+    void report_WhoCall(int who,const vector<int>& landLordCards);
+    //报告 叫地主信息
+    void report_Call(int id,bool isCall,const vector<int>& landLordCards);
+    //报告 叫地主反馈
+    void report_CallFd(bool isCall/*,const vector<int>& landLordCards*/);
 private:
     explicit ClientSocket();                  //构造器
     static void readConfig();                 //读取配置文件
@@ -54,6 +61,9 @@ public:
     void sendEnterRoom(int playerID);
     //发送出牌请求
     void sendChupai(int playerID,int num,int cards[]);
+    //发送叫地主请求
+    void sendJiaodizhu(int playerID, bool isCall, int landLordCards[]);
+
 };
 
 #endif

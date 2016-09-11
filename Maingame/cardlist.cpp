@@ -1,5 +1,6 @@
 #include "cardlist.h"
 #include "ui_cardlist.h"
+#include "universal.h"
 
 CardList::CardList(QWidget *parent) :
     QWidget(parent),
@@ -33,7 +34,7 @@ QPixmap CardList::pictureShot(int value)
         y=((value-1)%4)*_HCard;
     }
     //截图小图
-    QPixmap pics(":/image/res/card.png");
+    QPixmap pics(":/img/res/card2.png");
     QPixmap cardpic=pics.copy(x,y,_WCard,_HCard);
     return cardpic;
 }
@@ -41,7 +42,7 @@ QPixmap CardList::pictureShot(int value)
 //初始化窗体的属性
 void CardList::originWindow()
 {
-    setFixedHeight(105);
+    setFixedHeight(105*universal::setpix);
 }
 
 //初始化卡牌标签的属性

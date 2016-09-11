@@ -13,6 +13,8 @@
 #include "infoitem.h"
 #include "gamesound.h"
 #include "cardlist.h"
+#include "card.h"
+#include "hand.h"
 #include "gameoverframe.h"
 
 namespace Ui {
@@ -68,10 +70,16 @@ public slots:
     void receive_Origin(int landlordID,int num,const vector<int>& cards);
     //处理 轮谁出牌的消息(ok)
     void receive_Who(int who);
+    //处理 轮谁叫地主的消息
+    void receive_WhoCall(int who,const vector<int>& landLordCards);
     //处理 某人出牌成功的消息(ok)
     void receive_Cards(int playerID,int num,const vector<int>& cards);
+    //处理 某人叫地主成功的消息
+    void receive_Call(int playerID, bool isCall,const vector<int>& landLordCards);
     //处理 自己出牌成败反馈的消息(ok)
     void receive_ActionFd(bool res);
+    //处理 自己叫地主成败反馈的消息
+    void receive_CallFd(bool isCall/*,const vector<int>& landLordCards*/);
 private:
     Ui::Maingame *ui;
     //ui成员:
@@ -92,6 +100,8 @@ private:
     //我方手牌区:
     QPushButton * _action;       //出牌按钮
     QPushButton * _giveUp;       //弃权过按钮
+    QPushButton * _jiaodizhu;    //叫地主按钮
+    QPushButton * _bujiao;       //不叫地主按钮
     QLabel * _cardLabels[20];    //手牌标签
     //非ui成员:
     Player _self;                //自己
@@ -102,6 +112,8 @@ private:
     bool _canChooseCard;         //是否可以选中手牌
     bool _canAction;             //是否可以点击 出牌按钮
     bool _canGiveUp;             //是否可以点击 弃权按钮
+    bool _canJiaodizhu;          //是否可以点击叫地主
+    bool _canBujiao;             //是否可以点击不叫
     QTimer * _timer;             //出牌限时控制器
     int _restSeconds;            //剩余出牌秒数
 };

@@ -1,6 +1,6 @@
 #ifndef WARREGION_H
 #define WARREGION_H
-
+#include "universal.h"
 #include <QWidget>
 #include <QLabel>
 #include <vector>
