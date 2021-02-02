@@ -240,6 +240,7 @@ void MainInterface::timeDisplay()
     if(time<1)
     {
         timer->stop();
+        on_pass_clicked();
 
     }
     else
